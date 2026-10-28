@@ -18,8 +18,8 @@ Aplicación web de LogiRed S.A.S., empresa de logística y mensajería, para ges
 |`ms-usuarios`|Usuario|Docente|3001|—|
 |`ms-clientes`|Cliente|(nombre)|3002|—|
 |`ms-envios`|Envío|(nombre)|3003|`ms-clientes` (guarda `cliente\_id`)|
-|`ms-conductores`|Conductor|(nombre)|3004|(completar)|
-|`ms-vehiculos`|Vehículo|(nombre)|3005|(completar)|
+|`ms-conductores`|Conductor|(nombre)|3004|(es consultado por `ms-vehiculos`)|
+|`ms-vehiculos`|Vehículo|(nombre)|3005|`ms-conductores` (guarda `conductor_id`)|
 
 
 
