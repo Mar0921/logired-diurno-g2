@@ -1,0 +1,1 @@
+# logired-diurno-g2
