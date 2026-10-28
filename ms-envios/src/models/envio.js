@@ -1,5 +1,5 @@
 // MODELO: atributos de la entidad Envío y su validación
-const ESTADOS = ['registrado', 'en_transito', 'entregado', 'cancelado'];
+const ESTADOS = ['registrado', 'en_transito', 'entregado'];
 
 const esTextoNoVacio = (v) => typeof v === 'string' && v.trim() !== '';
 
