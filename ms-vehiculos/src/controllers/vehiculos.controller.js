@@ -12,19 +12,16 @@ function leerId(req) {
   return id;
 }
 
-// GET /vehiculos
 async function listar(req, res) {
   const vehiculos = await service.listar();
   res.status(200).json(vehiculos);
 }
 
-// GET /vehiculos/:id
 async function obtener(req, res) {
   const vehiculo = await service.obtener(leerId(req));
   res.status(200).json(vehiculo);
 }
 
-// POST /vehiculos
 async function crear(req, res) {
   const nuevo = await service.crear(req.body);
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);

@@ -1,13 +1,3 @@
-// =====================================================================
-// CAPA DE MODELO (entidad)
-// Define qué campos tiene un Vehículo y qué reglas deben cumplir.
-// No sabe nada de HTTP ni de bases de datos.
-//
-// conductor_id es una REFERENCIA a ms-conductores: aquí solo se valida
-// el formato (entero positivo o null). Que el conductor exista se
-// verifica por REST en el Taller 3.
-// =====================================================================
-
 const TIPOS = ['moto', 'furgon', 'camion'];
 const ESTADOS = ['disponible', 'en_ruta', 'mantenimiento'];
 
@@ -18,7 +8,6 @@ function normalizarPlaca(placa) {
   return placa.trim().toUpperCase().replace(/[\s-]/g, '');
 }
 
-// Devuelve una lista de errores de validación (vacía si todo está bien)
 function validarVehiculo(datos) {
   const errores = [];
   if (!datos || typeof datos !== 'object') {
@@ -46,7 +35,6 @@ function validarVehiculo(datos) {
   return errores;
 }
 
-// Construye un vehículo "limpio" solo con los campos permitidos
 function construirVehiculo(datos) {
   return {
     placa: normalizarPlaca(datos.placa),

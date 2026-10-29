@@ -1,11 +1,3 @@
-// =====================================================================
-// CAPA DE ACCESO A DATOS (repositorio)
-// Única capa que sabe DÓNDE se guardan los datos.
-// Versión del Taller 1: datos en memoria (se pierden al reiniciar).
-// En el Taller 2 se reemplaza por MySQL SIN tocar las otras capas.
-// Todas las funciones son async (devuelven promesas) para que el cambio
-// a una base de datos real no obligue a modificar la capa de servicio.
-// =====================================================================
 const vehiculos = [
   { id: 1, placa: 'ABC123', tipo: 'furgon', capacidad_kg: 1500, estado: 'disponible', conductor_id: 1 },
   { id: 2, placa: 'XYZ45D', tipo: 'moto', capacidad_kg: 30, estado: 'en_ruta', conductor_id: 2 },

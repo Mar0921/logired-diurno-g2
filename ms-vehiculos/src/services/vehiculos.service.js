@@ -1,8 +1,3 @@
-// =====================================================================
-// CAPA DE SERVICIO (lógica de negocio)
-// Aplica las reglas del negocio y las validaciones.
-// No sabe nada de HTTP (req/res) ni de cómo se guardan los datos.
-// =====================================================================
 const repo = require('../repositories/vehiculos.repository');
 const { validarVehiculo, construirVehiculo } = require('../models/vehiculo');
 const HttpError = require('../utils/http-error');
