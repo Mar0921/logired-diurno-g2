@@ -1,13 +1,11 @@
-// LÓGICA DE NEGOCIO: validaciones y reglas. No conoce HTTP ni dónde se guardan los datos.
+// LÓGICA DE NEGOCIO: validaciones y reglas.
 const repo = require('../repositories/conductores.repository');
 const { validarConductor, construirConductor } = require('../models/conductor');
 const HttpError = require('../utils/HttpError');
 
-// Recibe el parámetro de la URL (ej. "1,2,3") y lo procesa
 async function listar(idsParam) {
   let ids = null;
   if (idsParam) {
-    // Convierte "1,2,3" en [1, 2, 3] y filtra nulos si hay errores de tipeo
     ids = idsParam.split(',').map(Number).filter(n => !isNaN(n));
   }
   return repo.findAll(ids);
@@ -23,10 +21,20 @@ async function obtener(idTexto) {
 }
 
 async function crear(datos) {
+  // 1. Validar la forma de los datos (Modelo)
   const errores = validarConductor(datos);
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
+  // 2. Construir el registro limpio
   const conductor = construirConductor(datos);
+
+  // 3. REGLA DE NEGOCIO: Validar que la cédula sea única
+  const conductorExistente = await repo.findByCedula(conductor.cedula);
+  if (conductorExistente) {
+    throw new HttpError(409, `Ya existe un conductor con la cédula ${conductor.cedula}`);
+  }
+
+  // 4. Guardar
   return repo.create(conductor);
 }
 
