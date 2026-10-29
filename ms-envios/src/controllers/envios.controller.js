@@ -14,4 +14,13 @@ async function crear(req, res) {
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
 }
 
+async function crear(req, res, next) {
+  try {
+    const envio = await service.crear(req.body);
+    res.status(201).json(envio);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = { listar, obtener, crear };
