@@ -1,65 +1,57 @@
-// ACCESO A DATOS: único que sabe dónde se guardan los envíos.
-// Funciones async: en el Taller 2 pasan a consultar MySQL
-// sin cambiar el servicio ni el controlador.
+// src/repositories/envios.repository.js — versión MySQL
+// Mismas funciones, mismos parámetros y mismo tipo de resultado que la versión en memoria.
+const pool = require('../db');
 
-const envios = [
-  {
-    id: 1,
-    numero_guia: 'LR-2026-000001',
-    cliente_id: 1,
-    peso_kg: 2.5,
-    ciudad_destino: 'Medellín',
-    direccion_destino: 'Carrera 43A # 1-50',
-    estado: 'registrado',
-    fecha_registro: '2026-10-26'
-  },
-  {
-    id: 2,
-    numero_guia: 'LR-2026-000002',
-    cliente_id: 2,
-    peso_kg: 10,
-    ciudad_destino: 'Bogotá',
-    direccion_destino: 'Calle 72 # 10-34',
-    estado: 'en_transito',
-    fecha_registro: '2026-10-26'
-  },
-  {
-    id: 3,
-    numero_guia: 'LR-2026-000003',
-    cliente_id: 3,
-    peso_kg: 0.8,
-    ciudad_destino: 'Cali',
-    direccion_destino: 'Avenida 6N # 25-10',
-    estado: 'entregado',
-    fecha_registro: '2026-10-25'
+// filtros.estado: solo devuelve los envíos en ese estado
+async function findAll(filtros = {}) {
+  let sql = 'SELECT * FROM envios';
+  const valores = [];
+  if (filtros.estado !== undefined) {
+    sql += ' WHERE estado = ?';
+    valores.push(filtros.estado);
   }
-];
-
-let siguienteId = 4;
-
-async function findAll() {
-  return envios;
+  const [filas] = await pool.query(sql + ' ORDER BY id', valores);
+  return filas;
 }
 
 async function findById(id) {
-  return envios.find((e) => e.id === id) || null;
+  // ? es un parámetro: el valor viaja aparte de la consulta (evita inyección SQL)
+  const [filas] = await pool.query('SELECT * FROM envios WHERE id = ?', [id]);
+  return filas.length > 0 ? filas[0] : null;
+}
+
+async function findByNumeroGuia(numeroGuia) {
+  const [filas] = await pool.query('SELECT * FROM envios WHERE numero_guia = ?', [numeroGuia]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function create(envio) {
-  const id = siguienteId++;
-
-  const nuevo = {
-    id,
-    ...envio
-  };
-
-  envios.push(nuevo);
-
-  return nuevo;
+  const [resultado] = await pool.query(
+    `INSERT INTO envios
+       (numero_guia, cliente_id, peso_kg, ciudad_destino, direccion_destino, estado, fecha_registro)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [envio.numero_guia, envio.cliente_id, envio.peso_kg, envio.ciudad_destino,
+     envio.direccion_destino, envio.estado, envio.fecha_registro]
+  );
+  return findById(resultado.insertId); // MySQL devuelve el id generado
 }
 
-module.exports = {
-  findAll,
-  findById,
-  create
-};
+async function update(id, datos) {
+  const [resultado] = await pool.query(
+    `UPDATE envios
+        SET numero_guia = ?, cliente_id = ?, peso_kg = ?,
+            ciudad_destino = ?, direccion_destino = ?, estado = ?
+      WHERE id = ?`,
+    [datos.numero_guia, datos.cliente_id, datos.peso_kg,
+     datos.ciudad_destino, datos.direccion_destino, datos.estado, id]
+  );
+  if (resultado.affectedRows === 0) return null; // no existe
+  return findById(id);
+}
+
+async function remove(id) {
+  const [resultado] = await pool.query('DELETE FROM envios WHERE id = ?', [id]);
+  return resultado.affectedRows > 0;
+}
+
+module.exports = { findAll, findById, findByNumeroGuia, create, update, remove };

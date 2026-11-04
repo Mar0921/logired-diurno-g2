@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "ms-envios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:3003"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 · Listar todos → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 · Filtrar por estado → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios?estado=en_transito"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · Obtener existente → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 · Obtener inexistente → 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios/99"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", function () { pm.expect(pm.response.code).to.be.oneOf([404]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Obtener con id no numérico → 400",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios/abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", function () { pm.expect(pm.response.code).to.be.oneOf([400]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 · Crear válido → 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 3,\n  \"peso_kg\": 2.5,\n  \"ciudad_destino\": \"Medellín\",\n  \"direccion_destino\": \"Carrera 43A # 1-50\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 201\", function () { pm.expect(pm.response.code).to.be.oneOf([201]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 · Crear sin datos obligatorios → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"peso_kg\": 2.5,\n  \"ciudad_destino\": \"Medellín\",\n  \"direccion_destino\": \"Carrera 43A # 1-50\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", function () { pm.expect(pm.response.code).to.be.oneOf([400]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 · Crear con numero_guia repetido → 409",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 3,\n  \"peso_kg\": 2.5,\n  \"ciudad_destino\": \"Medellín\",\n  \"direccion_destino\": \"Carrera 43A # 1-50\",\n  \"numero_guia\": \"LR-2026-000001\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 409\", function () { pm.expect(pm.response.code).to.be.oneOf([409]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 · Actualizar existente → 200",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios/1",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"numero_guia\": \"LR-2026-000001\",\n  \"cliente_id\": 1,\n  \"peso_kg\": 3,\n  \"ciudad_destino\": \"Medellín\",\n  \"direccion_destino\": \"Carrera 43A # 1-50\",\n  \"estado\": \"en_transito\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 · Actualizar inexistente → 404",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios/99",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"numero_guia\": \"LR-2026-000001\",\n  \"cliente_id\": 1,\n  \"peso_kg\": 3,\n  \"ciudad_destino\": \"Medellín\",\n  \"direccion_destino\": \"Carrera 43A # 1-50\",\n  \"estado\": \"en_transito\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", function () { pm.expect(pm.response.code).to.be.oneOf([404]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · Eliminar existente → 204",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base}}/envios/3"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 204\", function () { pm.expect(pm.response.code).to.be.oneOf([204]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 · Eliminar otra vez → 404",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base}}/envios/3"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", function () { pm.expect(pm.response.code).to.be.oneOf([404]); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
