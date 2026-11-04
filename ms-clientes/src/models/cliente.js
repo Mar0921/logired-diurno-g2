@@ -1,10 +1,10 @@
 // =====================================================================
 // CAPA DE MODELO (entidad)
-// Define qué campos tiene un Usuario y qué reglas deben cumplir.
+// Define qué campos tiene un Cliente y qué reglas deben cumplir.
 // No sabe nada de HTTP ni de bases de datos.
 //
-// Versión del Taller 1: todavía sin contraseña. La contraseña cifrada
-// y el inicio de sesión se agregan en la versión completa (Taller 3).
+// Atributos acordados en el contrato de la API del grupo:
+// id, nombre, documento, telefono, email (opcional), ciudad
 // =====================================================================
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,8 +25,11 @@ function validarCliente(datos) {
   if (typeof datos.telefono !== 'string' || !TELEFONO_VALIDO.test(datos.telefono.trim())) {
     errores.push('telefono es obligatorio y debe tener entre 7 y 15 caracteres numéricos');
   }
-  if (typeof datos.email !== 'string' || !EMAIL_VALIDO.test(datos.email.trim())) {
-    errores.push('email es obligatorio y debe tener un formato válido');
+  // email es opcional: solo se valida el formato cuando viene
+  if (datos.email !== undefined && datos.email !== null && datos.email !== '') {
+    if (typeof datos.email !== 'string' || !EMAIL_VALIDO.test(datos.email.trim())) {
+      errores.push('email debe tener un formato válido');
+    }
   }
   if (!datos.ciudad || typeof datos.ciudad !== 'string' || datos.ciudad.trim() === '') {
     errores.push('ciudad es obligatoria');
@@ -40,7 +43,7 @@ function construirCliente(datos) {
     nombre: datos.nombre.trim(),
     documento: datos.documento.trim(),
     telefono: datos.telefono.trim(),
-    email: datos.email.trim().toLowerCase(),
+    email: datos.email ? datos.email.trim().toLowerCase() : null,
     ciudad: datos.ciudad.trim(),
   };
 }

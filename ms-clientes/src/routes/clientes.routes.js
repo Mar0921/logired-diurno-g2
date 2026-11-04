@@ -7,9 +7,9 @@ const controller = require('../controllers/clientes.controller');
 
 const router = Router();
 
-router.get('/', controller.listar);      // listar todos los usuarios
-router.get('/:id', controller.obtener);  // obtener un usuario por id
-router.post('/', controller.crear);      // crear un usuario
+router.get('/', controller.listar);      // listar todos los clientes
+router.get('/:id', controller.obtener);  // obtener un cliente por id
+router.post('/', controller.crear);      // crear un cliente
 
 // Taller 2: agregar PUT /:id (actualizar) y DELETE /:id (eliminar)
 
