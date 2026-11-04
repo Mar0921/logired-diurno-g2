@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const controller = require('../controllers/conductores.controller');
-const asyncHandler = require('../utils/asyncHandler'); // <-- Importante
+const asyncHandler = require('../utils/asyncHandler'); 
 
 const router = Router();
 
