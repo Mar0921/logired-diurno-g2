@@ -4,13 +4,20 @@ Microservicio de vehículos de reparto de LogiRed. Responsable: Santiago Peña A
 
 ## Cómo ejecutarlo
 
-Requisitos: Node.js 22 o superior. Por ahora los datos están en memoria (se pierden al reiniciar).
+Requisitos: Node.js 22 o superior y MySQL o MariaDB (por ejemplo, el de XAMPP) corriendo en el puerto 3306.
 
+1. Crear la base de datos y su usuario, como administrador (en XAMPP: botón **Shell** → `mysql -u root`):
+
+```sql
+CREATE DATABASE vehiculos_db CHARACTER SET utf8mb4;
+CREATE USER 'vehiculos_user'@'localhost' IDENTIFIED BY 'una-clave-segura';
+GRANT ALL PRIVILEGES ON vehiculos_db.* TO 'vehiculos_user'@'localhost';
 ```
-npm install
-copy .env.example .env      # en Linux/Mac: cp .env.example .env
-npm run dev
-```
+
+2. Crear la tabla y los 3 registros iniciales, desde la carpeta `ms-vehiculos`: `mysql -u vehiculos_user -p vehiculos_db` y luego `SOURCE db/schema.sql;`
+3. `npm install`
+4. Copiar `.env.example` como `.env` y ajustar la contraseña de la base de datos.
+5. `npm run dev`
 
 ## Representación
 

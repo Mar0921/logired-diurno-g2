@@ -1,53 +1,58 @@
-// =====================================================================
-// CAPA DE ACCESO A DATOS (repositorio)
-// Única capa que sabe DÓNDE se guardan los datos.
-// Versión en memoria (se pierden al reiniciar). En la Parte 3 se
-// reemplaza por MySQL SIN tocar las otras capas.
-// =====================================================================
-const vehiculos = [
-  { id: 1, placa: 'ABC123', tipo: 'furgon', capacidad_kg: 1500, estado: 'disponible', conductor_id: 1 },
-  { id: 2, placa: 'XYZ45D', tipo: 'moto', capacidad_kg: 30, estado: 'en_ruta', conductor_id: 2 },
-  { id: 3, placa: 'KLM789', tipo: 'camion', capacidad_kg: 8000, estado: 'mantenimiento', conductor_id: null },
-];
-let siguienteId = 4;
+// src/repositories/vehiculos.repository.js — versión MySQL
+// Única capa que sabe DÓNDE se guardan los datos. Las funciones conservan
+// el mismo nombre, parámetros y tipo de resultado que la versión en memoria.
+const pool = require('../db');
 
-// Aplica los filtros que lleguen: estado, tipo, ids
 async function findAll(filtros = {}) {
-  let resultado = vehiculos;
-  if (filtros.estado) resultado = resultado.filter((v) => v.estado === filtros.estado);
-  if (filtros.tipo) resultado = resultado.filter((v) => v.tipo === filtros.tipo);
-  if (filtros.ids) resultado = resultado.filter((v) => filtros.ids.includes(v.id));
-  return resultado;
+  let sql = 'SELECT * FROM vehiculos';
+  const condiciones = [];
+  const valores = [];
+  if (filtros.estado) {                    // ?estado=disponible
+    condiciones.push('estado = ?');
+    valores.push(filtros.estado);
+  }
+  if (filtros.tipo) {                      // ?tipo=furgon
+    condiciones.push('tipo = ?');
+    valores.push(filtros.tipo);
+  }
+  if (filtros.ids) {                       // ?ids=1,2,3 → WHERE id IN (1, 2, 3)
+    condiciones.push('id IN (?)');
+    valores.push(filtros.ids);
+  }
+  if (condiciones.length > 0) sql += ' WHERE ' + condiciones.join(' AND ');
+  const [filas] = await pool.query(sql + ' ORDER BY id', valores);
+  return filas;
 }
 
 async function findById(id) {
-  return vehiculos.find((v) => v.id === id) || null;
+  // ? es un parámetro: el valor viaja aparte de la consulta (evita inyección SQL)
+  const [filas] = await pool.query('SELECT * FROM vehiculos WHERE id = ?', [id]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function findByPlaca(placa) {
-  return vehiculos.find((v) => v.placa === placa) || null;
+  const [filas] = await pool.query('SELECT * FROM vehiculos WHERE placa = ?', [placa]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function create(vehiculo) {
-  const nuevo = { id: siguienteId++, ...vehiculo };
-  vehiculos.push(nuevo);
-  return nuevo;
+  const [resultado] = await pool.query(
+    'INSERT INTO vehiculos (placa, tipo, capacidad_kg, estado, conductor_id) VALUES (?, ?, ?, ?, ?)',
+    [vehiculo.placa, vehiculo.tipo, vehiculo.capacidad_kg, vehiculo.estado, vehiculo.conductor_id]);
+  return findById(resultado.insertId);     // MySQL devuelve el id generado
 }
 
-// Reemplaza los datos del vehículo. Devuelve null si no existe.
 async function update(id, vehiculo) {
-  const i = vehiculos.findIndex((v) => v.id === id);
-  if (i === -1) return null;
-  vehiculos[i] = { id, ...vehiculo };
-  return vehiculos[i];
+  const [resultado] = await pool.query(
+    'UPDATE vehiculos SET placa = ?, tipo = ?, capacidad_kg = ?, estado = ?, conductor_id = ? WHERE id = ?',
+    [vehiculo.placa, vehiculo.tipo, vehiculo.capacidad_kg, vehiculo.estado, vehiculo.conductor_id, id]);
+  if (resultado.affectedRows === 0) return null;   // no existía ese id
+  return findById(id);
 }
 
-// Elimina el vehículo. Devuelve true si existía, false si no.
 async function remove(id) {
-  const i = vehiculos.findIndex((v) => v.id === id);
-  if (i === -1) return false;
-  vehiculos.splice(i, 1);
-  return true;
+  const [resultado] = await pool.query('DELETE FROM vehiculos WHERE id = ?', [id]);
+  return resultado.affectedRows > 0;
 }
 
 module.exports = { findAll, findById, findByPlaca, create, update, remove };
