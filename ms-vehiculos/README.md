@@ -1,54 +1,60 @@
-# ms-vehiculos · Taller 1 (Módulo 3) · LogiRed S.A.S.
+# ms-vehiculos · Contrato de la API
 
-Redes y Servicios Multimedia · UAO · Microservicio de **vehículos de reparto** de la aplicación
-de LogiRed, con **Node.js + Express** organizado en capas, a partir de la plantilla de ms-usuarios.
-
-Versión del Taller 1: datos en memoria y tres operaciones (GET listado, GET por id, POST).
+Microservicio de vehículos de reparto de LogiRed. Responsable: Santiago Peña Agudelo. Puerto: **3005**.
 
 ## Cómo ejecutarlo
 
-Requisitos: Node.js LTS 22 o superior (`node -v`).
+Requisitos: Node.js 22 o superior. Por ahora los datos están en memoria (se pierden al reiniciar).
 
 ```
-npm install                 # descarga Express en node_modules
-copy .env.example .env      # en Windows (en Linux/Mac: cp .env.example .env)
-npm run dev                 # inicia y se reinicia solo al guardar cambios
+npm install
+copy .env.example .env      # en Linux/Mac: cp .env.example .env
+npm run dev
 ```
 
-Prueben en el navegador: http://localhost:3005/health y http://localhost:3005/vehiculos
+## Representación
 
-## Entidad
+```json
+{ "id": 1, "placa": "ABC123", "tipo": "furgon", "capacidad_kg": 1500, "estado": "disponible", "conductor_id": 1 }
+```
 
-| Atributo | Tipo | Reglas |
-|---|---|---|
-| id | entero | Lo asigna el servicio |
-| placa | texto | Obligatoria, única, formato `ABC123` (motos `ABC12D`); se guarda en mayúsculas |
-| tipo | texto | `moto` · `furgon` · `camion` |
-| capacidad_kg | número | Obligatoria, mayor que 0 |
-| estado | texto | `disponible` (por defecto) · `en_ruta` · `mantenimiento` |
-| conductor_id | entero o null | Referencia a **ms-conductores** (se valida por REST en el Taller 3) |
+## Atributos
 
-## Capas
+| Atributo | Tipo | ¿Obligatorio al crear? | Reglas |
+|---|---|---|---|
+| id | entero | No: lo asigna el servicio | Positivo y único |
+| placa | texto | Sí | Formato `ABC123` (motos `ABC12D`); se guarda en mayúsculas; **única** (409) |
+| tipo | texto | Sí | `moto` · `furgon` · `camion` |
+| capacidad_kg | decimal | Sí | Mayor que 0 |
+| estado | texto | No (por defecto `disponible`) | `disponible` · `en_ruta` · `mantenimiento` |
+| conductor_id | entero o null | No (por defecto `null`) | Entero positivo; referencia a ms-conductores |
 
-| Archivo | Capa | Responsabilidad |
-|---|---|---|
-| src/index.js | Arranque | Lee PORT y HOST y pone el servidor a escuchar |
-| src/app.js | Configuración | Middlewares, /health, montaje de rutas, manejo de errores |
-| src/routes/vehiculos.routes.js | Presentación | Método HTTP + URI → función del controlador |
-| src/controllers/vehiculos.controller.js | Presentación | Lee la petición, llama al servicio, arma la respuesta |
-| src/services/vehiculos.service.js | Lógica de negocio | Validaciones y reglas (placa única); no conoce HTTP ni la base de datos |
-| src/repositories/vehiculos.repository.js | Acceso a datos | Guarda y consulta (en memoria en el Taller 1) |
-| src/models/vehiculo.js | Modelo | Atributos de la entidad y su validación |
-| src/utils/http-error.js | Utilidad | Error con código de estado HTTP |
+## Endpoints
 
-## Endpoints (Taller 1)
+| Operación | Método | URI | Respuesta exitosa | Errores |
+|---|---|---|---|---|
+| Listar | GET | /vehiculos | 200 arreglo | — |
+| Filtrar | GET | /vehiculos?estado=disponible (también ?tipo=) | 200 arreglo | — |
+| Consultar por lotes | GET | /vehiculos?ids=1,3 | 200 arreglo | 400 |
+| Obtener | GET | /vehiculos/:id | 200 objeto | 400 · 404 |
+| Crear | POST | /vehiculos | 201 objeto + Location | 400 · 409 |
+| Actualizar | PUT | /vehiculos/:id | 200 objeto | 400 · 404 · 409 |
+| Eliminar | DELETE | /vehiculos/:id | 204 | 400 · 404 |
 
-| Método | URI | Respuesta |
-|---|---|---|
-| GET | /health | 200 `{"servicio":"ms-vehiculos","estado":"ok"}` |
-| GET | /vehiculos | 200 arreglo de vehículos |
-| GET | /vehiculos/:id | 200 vehículo · 400 id inválido · 404 no existe |
-| POST | /vehiculos | 201 vehículo creado · 400 datos inválidos · 409 placa repetida |
+Ejemplo para crear:
 
-Ejemplo de cuerpo para POST:
-`{"placa": "DEF456", "tipo": "furgon", "capacidad_kg": 1200, "estado": "disponible", "conductor_id": 3}`
+```json
+{ "placa": "DEF456", "tipo": "furgon", "capacidad_kg": 1200, "conductor_id": 3 }
+```
+
+Errores: `{ "error": "mensaje", "detalles": ["..."] }` (detalles solo en errores de validación).
+
+## Relaciones
+
+**Consulto a:**
+
+| Atributo | Microservicio consultado | Para validar (al crear y actualizar) | Para componer (al consultar) | Datos que usa |
+|---|---|---|---|---|
+| conductor_id | ms-conductores | GET /conductores/:id | GET /conductores?ids=… | id, nombre, telefono |
+
+**Me consultan:** ninguno en un grupo de 4 (ms-rutas solo existe en grupos de 5).
