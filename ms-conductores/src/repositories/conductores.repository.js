@@ -1,32 +1,55 @@
-// ACCESO A DATOS: único que sabe dónde se guardan los conductores.
-const conductores = [
-  { id: 1, nombre: 'Carlos Pérez', cedula: '12345678', categoria_licencia: 'C2', telefono: '3001234567', sede: 'Cali' },
-  { id: 2, nombre: 'Ana Gómez', cedula: '87654321', categoria_licencia: 'C3', telefono: '3109876543', sede: 'Medellín' },
-  { id: 3, nombre: 'Luis Rodríguez', cedula: '11223344', categoria_licencia: 'C2', telefono: '3205556677', sede: 'Bogotá' },
-];
-let siguienteId = 4;
+const pool = require('../db');
 
-async function findAll(ids = null) {
-  if (ids && Array.isArray(ids) && ids.length > 0) {
-    return conductores.filter((c) => ids.includes(c.id));
+async function findAll(filtros = {}) {
+  let sql = 'SELECT * FROM conductores';
+  const condiciones = [];
+  const valores = [];
+
+  if (filtros.sede) {
+    condiciones.push('sede = ?');
+    valores.push(filtros.sede);
   }
-  return conductores;
+  if (filtros.ids) {
+    condiciones.push('id IN (?)');
+    valores.push(filtros.ids);
+  }
+
+  if (condiciones.length > 0) sql += ' WHERE ' + condiciones.join(' AND ');
+  
+  const [filas] = await pool.query(sql + ' ORDER BY id', valores);
+  return filas;
 }
 
 async function findById(id) {
-  return conductores.find((c) => c.id === id) || null;
+  const [filas] = await pool.query('SELECT * FROM conductores WHERE id = ?', [id]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
-// NUEVA FUNCIÓN: Buscar por cédula para validar que sea única
 async function findByCedula(cedula) {
-  return conductores.find((c) => c.cedula === cedula) || null;
+  const [filas] = await pool.query('SELECT * FROM conductores WHERE cedula = ?', [cedula]);
+  return filas.length > 0 ? filas[0] : null;
 }
 
 async function create(conductor) {
-  const id = siguienteId++;
-  const nuevo = { id, ...conductor };
-  conductores.push(nuevo);
-  return nuevo;
+  const [resultado] = await pool.query(
+    'INSERT INTO conductores (nombre, cedula, categoria_licencia, telefono, sede) VALUES (?, ?, ?, ?, ?)',
+    [conductor.nombre, conductor.cedula, conductor.categoria_licencia, conductor.telefono, conductor.sede]
+  );
+  return findById(resultado.insertId);
 }
 
-module.exports = { findAll, findById, findByCedula, create };
+async function update(id, conductor) {
+  const [resultado] = await pool.query(
+    'UPDATE conductores SET nombre = ?, cedula = ?, categoria_licencia = ?, telefono = ?, sede = ? WHERE id = ?',
+    [conductor.nombre, conductor.cedula, conductor.categoria_licencia, conductor.telefono, conductor.sede, id]
+  );
+  if (resultado.affectedRows === 0) return null;
+  return findById(id);
+}
+
+async function remove(id) {
+  const [resultado] = await pool.query('DELETE FROM conductores WHERE id = ?', [id]);
+  return resultado.affectedRows > 0;
+}
+
+module.exports = { findAll, findById, findByCedula, create, update, remove };

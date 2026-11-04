@@ -1,41 +1,52 @@
-// LÓGICA DE NEGOCIO: validaciones y reglas.
 const repo = require('../repositories/conductores.repository');
 const { validarConductor, construirConductor } = require('../models/conductor');
-const HttpError = require('../utils/HttpError');
+const HttpError = require('../utils/http-error');
 
-async function listar(idsParam) {
-  let ids = null;
-  if (idsParam) {
-    ids = idsParam.split(',').map(Number).filter(n => !isNaN(n));
-  }
-  return repo.findAll(ids);
+async function listar(filtros) {
+  return repo.findAll(filtros);
 }
 
-async function obtener(idTexto) {
-  if (!/^\d+$/.test(String(idTexto)) || Number(idTexto) < 1) {
-    throw new HttpError(400, 'El id debe ser un número entero positivo');
-  }
-  const conductor = await repo.findById(Number(idTexto));
-  if (!conductor) throw new HttpError(404, `No existe un conductor con id ${idTexto}`);
+async function obtener(id) {
+  const conductor = await repo.findById(id);
+  // Mensaje estandarizado igual a ms-envios
+  if (!conductor) throw new HttpError(404, `No existe un conductor con id ${id}`);
   return conductor;
 }
 
 async function crear(datos) {
-  // 1. Validar la forma de los datos (Modelo)
+  // Validación estructural (400)
   const errores = validarConductor(datos);
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
-  // 2. Construir el registro limpio
   const conductor = construirConductor(datos);
 
-  // 3. REGLA DE NEGOCIO: Validar que la cédula sea única
-  const conductorExistente = await repo.findByCedula(conductor.cedula);
-  if (conductorExistente) {
+  // Regla de negocio (409) - Mismo formato que ms-usuarios con el email
+  if (await repo.findByCedula(conductor.cedula)) {
     throw new HttpError(409, `Ya existe un conductor con la cédula ${conductor.cedula}`);
   }
 
-  // 4. Guardar
   return repo.create(conductor);
 }
 
-module.exports = { listar, obtener, crear };
+async function actualizar(id, datos) {
+  const errores = validarConductor(datos);
+  if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
+  
+  const conductor = construirConductor(datos);
+
+  const conductorExistente = await repo.findByCedula(conductor.cedula);
+  if (conductorExistente && conductorExistente.id !== id) {
+    throw new HttpError(409, `La cédula ${conductor.cedula} ya está registrada por otro conductor`);
+  }
+
+  const actualizado = await repo.update(id, conductor);
+  if (!actualizado) throw new HttpError(404, `No existe un conductor con id ${id}`);
+  return actualizado;
+}
+
+async function eliminar(id) {
+  const eliminado = await repo.remove(id);
+  if (!eliminado) throw new HttpError(404, `No existe un conductor con id ${id}`);
+}
+
+module.exports = { listar, obtener, crear, actualizar, eliminar };
