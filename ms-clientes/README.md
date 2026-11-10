@@ -46,17 +46,22 @@ Comprobación rápida: http://localhost:3002/health debe responder `{"servicio":
 | email | texto | No | Si viene, formato válido de correo; se guarda en minúsculas |
 | ciudad | texto | Sí | No vacío. Se usa en el filtro `?ciudad=` |
 
+Todas las peticiones llevan la cabecera `Authorization: Bearer <token>`. El token se obtiene en `POST /usuarios/login` de ms-usuarios. Quien consulte a ms-clientes desde otro microservicio debe reenviar el mismo token que recibió en la petición original; si no lo hace, ms-clientes responde 401.
+
 ## Endpoints
 
 | Operación | Método | URI | Respuesta exitosa | Errores |
 |---|---|---|---|---|
-| Listar | GET | /clientes | 200 arreglo | — |
-| Filtrar | GET | /clientes?ciudad=Cali | 200 arreglo | — |
-| Consultar por lotes | GET | /clientes?ids=1,3,4 | 200 arreglo | 400 |
-| Obtener | GET | /clientes/:id | 200 objeto | 400 · 404 |
-| Crear | POST | /clientes | 201 objeto + Location | 400 · 409 |
-| Actualizar | PUT | /clientes/:id | 200 objeto | 400 · 404 · 409 |
-| Eliminar | DELETE | /clientes/:id | 204 | 400 · 404 |
+| Listar | GET | /clientes | 200 arreglo | 401 |
+| Filtrar | GET | /clientes?ciudad=Cali | 200 arreglo | 401 |
+| Consultar por lotes | GET | /clientes?ids=1,3,4 | 200 arreglo | 400 · 401 |
+| Obtener | GET | /clientes/:id | 200 objeto | 400 · 401 · 404 |
+| Crear | POST | /clientes | 201 objeto + Location | 400 · 401 · 403 · 409 |
+| Actualizar | PUT | /clientes/:id | 200 objeto | 400 · 401 · 403 · 404 · 409 |
+| Eliminar | DELETE | /clientes/:id | 204 | 400 · 401 · 403 · 404 |
+
+- **401:** falta el token, es inválido o venció.
+- **403:** el rol del token no tiene permiso para esa operación. Los tres roles pueden consultar; solo administrador y despacho pueden crear, actualizar y eliminar.
 
 Ejemplo para crear. Petición:
 
