@@ -7,6 +7,12 @@ const app = express();
 app.use(cors()); // <-- Agregar
 app.use(express.json());
 
+// NUEVO: Registro de peticiones entrantes (para ver cuando ms-vehiculos nos consulta)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toLocaleTimeString()}] Petición recibida: ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ servicio: 'ms-conductores', estado: 'ok' });
 });
