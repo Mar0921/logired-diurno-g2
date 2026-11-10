@@ -42,6 +42,7 @@ mysql> SOURCE db/schema.sql;
 | `DB_NAME` | `vehiculos_db` | Base de datos de este microservicio |
 | `DB_USER` | `vehiculos_user` | Usuario de la base de datos |
 | `DB_PASSWORD` | `una-clave-segura` | Contraseña del usuario (la que pusiste en `IDENTIFIED BY`) |
+| `JWT_SECRET` | la frase del grupo | Clave para verificar los tokens; **la misma de ms-usuarios** |
 
 El archivo `.env` contiene la contraseña y **no se sube al repositorio**.
 
@@ -156,6 +157,18 @@ Respuesta `201 Created`, con la cabecera `Location: /vehiculos/4`:
 ```
 
 Errores: `{ "error": "mensaje", "detalles": ["..."] }` (`detalles` solo en errores de validación).
+
+## Seguridad (tokens JWT)
+
+Todas las peticiones a `/vehiculos` llevan la cabecera `Authorization: Bearer <token>`. El token se obtiene con `POST /usuarios/login` en ms-usuarios (puerto 3001). ms-vehiculos lo verifica con `JWT_SECRET`, sin preguntarle nada a ms-usuarios (`src/middlewares/auth.js`).
+
+| Operación | administrador | flota | despacho |
+|---|---|---|---|
+| Consultar (GET) | Sí | Sí | Sí |
+| Crear, actualizar, eliminar (POST, PUT, DELETE) | Sí | Sí | No (403) |
+
+- **401:** falta el token, es inválido o venció.
+- **403:** el rol del token no tiene permiso para esa operación.
 
 ## Relaciones
 
