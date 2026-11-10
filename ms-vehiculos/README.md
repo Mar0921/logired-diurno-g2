@@ -43,6 +43,7 @@ mysql> SOURCE db/schema.sql;
 | `DB_USER` | `vehiculos_user` | Usuario de la base de datos |
 | `DB_PASSWORD` | `una-clave-segura` | Contraseña del usuario (la que pusiste en `IDENTIFIED BY`) |
 | `JWT_SECRET` | la frase del grupo | Clave para verificar los tokens; **la misma de ms-usuarios** |
+| `CONDUCTORES_URL` | `http://127.0.0.1:3004` | Dirección de ms-conductores (para validar y componer) |
 
 El archivo `.env` contiene la contraseña y **no se sube al repositorio**.
 
@@ -71,7 +72,10 @@ Así responde `GET /vehiculos/1`:
 }
 ```
 
-`conductor_id` es lo que se guarda en la base de datos de ms-vehiculos (puede ser `null` si el vehículo aún no tiene conductor asignado). El objeto `conductor` **no se guarda**: ms-vehiculos lo pide a ms-conductores cada vez que responde (se agrega cuando se implementan las relaciones, en la semana 2). Mientras tanto, la respuesta trae los mismos atributos sin ese objeto.
+`conductor_id` es lo que se guarda en la base de datos de ms-vehiculos (puede ser `null` si el vehículo aún no tiene conductor asignado). El objeto `conductor` **no se guarda**: ms-vehiculos lo pide a ms-conductores cada vez que responde, en una sola petición por listado.
+
+- Si `conductor_id` es `null`, la respuesta trae `"conductor": null` y no se consulta a ms-conductores.
+- Si ms-conductores no responde al consultar, cada vehículo con conductor sale con `"conductor": null` y `"aviso": "ms-conductores no disponible"` (degradación controlada).
 
 ## Atributos
 
@@ -92,8 +96,8 @@ Así responde `GET /vehiculos/1`:
 | Filtrar | GET | `/vehiculos?estado=disponible` (también `?tipo=furgon`) | — | 200 + arreglo filtrado | — |
 | Consultar por lotes | GET | `/vehiculos?ids=1,3` | — | 200 + arreglo con esos registros | 400 ids inválidos |
 | Obtener | GET | `/vehiculos/:id` | — | 200 + objeto | 400 id inválido · 404 |
-| Crear | POST | `/vehiculos` | JSON sin `id` | 201 + objeto + cabecera `Location` | 400 · 409 |
-| Actualizar | PUT | `/vehiculos/:id` | JSON completo sin `id` | 200 + objeto actualizado | 400 · 404 · 409 |
+| Crear | POST | `/vehiculos` | JSON sin `id` | 201 + objeto con `conductor` + cabecera `Location` | 400 · 401 · 403 · 409 · 503 |
+| Actualizar | PUT | `/vehiculos/:id` | JSON completo sin `id` | 200 + objeto actualizado con `conductor` | 400 · 401 · 403 · 404 · 409 · 503 |
 | Eliminar | DELETE | `/vehiculos/:id` | — | 204 sin cuerpo | 400 · 404 |
 | Estado del servicio | GET | `/health` | — | 200 `{"servicio":"ms-vehiculos","estado":"ok"}` | — |
 
@@ -169,6 +173,8 @@ Todas las peticiones a `/vehiculos` llevan la cabecera `Authorization: Bearer <t
 
 - **401:** falta el token, es inválido o venció.
 - **403:** el rol del token no tiene permiso para esa operación.
+- **400** (al crear o actualizar): el `conductor_id` no existe en ms-conductores.
+- **503** (al crear o actualizar con conductor): ms-conductores no respondió y no se pudo verificar el conductor; no se guarda nada.
 
 ## Relaciones
 
@@ -184,8 +190,11 @@ Todas las peticiones a `/vehiculos` llevan la cabecera `Authorization: Bearer <t
 |---|---|---|
 | Ningún microservicio en un grupo de 4 (ms-rutas, que lo consultaría, solo existe en grupos de 5) | — | — |
 
+El token de la petición original se reenvía a ms-conductores (que también lo exige).
+El código de la relación está en `src/clients/conductores.client.js` (las peticiones a ms-conductores) y en `src/services/vehiculos.service.js` (`validarConductor` y `componer`).
+
 El filtro `?ids=` queda disponible como parte del contrato por si otro servicio lo necesita.
 
 ## Pruebas
 
-Colección de Postman en [`docs/ms-vehiculos.postman_collection.json`](docs/ms-vehiculos.postman_collection.json) (13 casos).
+Colección de Postman en [`docs/ms-vehiculos.postman_collection.json`](docs/ms-vehiculos.postman_collection.json) (casos 01 a 24, con login previo; los casos 23 y 24 se corren con **ms-conductores detenido**). Para Thunder Client: `docs/ms-vehiculos.thunder.json`, con las URLs escritas completas.

@@ -4,8 +4,8 @@
   "description": "Microservicio de conductores de LogiRed (Taller 1 - Módulo 3)",
   "main": "src/index.js",
   "scripts": {
-    "start": "node --env-file-if-exists=.env.example src/index.js",
-    "dev": "node --watch --env-file-if-exists=.env.example src/index.js"
+    "start": "node --env-file-if-exists=.env src/index.js",
+    "dev": "node --watch --env-file-if-exists=.env src/index.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
