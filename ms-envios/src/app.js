@@ -6,6 +6,12 @@ const app = express();
 
 app.use(express.json());
 
+// Registro: muestra en la terminal cada petición que llega
+app.use((req, res, next) => {
+  console.log(`${new Date().toLocaleTimeString()} ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ servicio: 'ms-envios', estado: 'ok' });
 });

@@ -1,7 +1,7 @@
 {
   "name": "ms-envios",
   "version": "1.0.0",
-  "description": "Microservicio de envíos de LogiRed (Taller 1 - Módulo 3)",
+  "description": "Microservicio de envios de LogiRed (Taller 1 - Modulo 3)",
   "main": "src/index.js",
   "scripts": {
     "start": "node --env-file-if-exists=.env src/index.js",
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
-    "mysql2": "^3.24.6"
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.11.0"
   }
 }

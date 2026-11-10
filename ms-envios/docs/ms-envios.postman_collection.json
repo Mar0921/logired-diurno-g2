@@ -7,6 +7,18 @@
     {
       "key": "base",
       "value": "http://localhost:3003"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenDespacho",
+      "value": ""
+    },
+    {
+      "key": "tokenFlota",
+      "value": ""
     }
   ],
   "item": [
@@ -307,6 +319,180 @@
           }
         }
       ]
+    },
+    {
+      "name": "14 · Sin token → 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 401\", function () { pm.expect(pm.response.code).to.be.oneOf([401]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 · Token modificado → 401",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}x"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 401\", function () { pm.expect(pm.response.code).to.be.oneOf([401]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 · GET con rol que solo consulta (flota) → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/envios",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenFlota}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 · POST con rol sin permiso (flota) → 403",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 3,\n  \"peso_kg\": 2.5,\n  \"ciudad_destino\": \"Cali\",\n  \"direccion_destino\": \"Calle 5 # 10-20\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenFlota}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 403\", function () { pm.expect(pm.response.code).to.be.oneOf([403]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 · POST con rol con permiso (despacho) → 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/envios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 3,\n  \"peso_kg\": 2.5,\n  \"ciudad_destino\": \"Cali\",\n  \"direccion_destino\": \"Calle 5 # 10-20\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenDespacho}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 201\", function () { pm.expect(pm.response.code).to.be.oneOf([201]); });"
+            ]
+          }
+        }
+      ]
     }
-  ]
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  }
 }
