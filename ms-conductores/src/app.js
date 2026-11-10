@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require('cors'); // <-- Agregar
 const conductoresRoutes = require('./routes/conductores.routes');
 
 const app = express();
 
+app.use(cors()); // <-- Agregar
 app.use(express.json());
 
 app.get('/health', (req, res) => {
