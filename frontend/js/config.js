@@ -3,6 +3,7 @@
 // En el Taller 3, detrás del gateway, las direcciones pasan a '/api/...'.
 // =====================================================================
 const API_USUARIOS = 'http://localhost:3001';
+const API_CLIENTES = 'http://localhost:3002';
 const API_ENVIOS = 'http://localhost:3003';
 
 const ROLES = ['administrador', 'despacho', 'flota'];
@@ -26,4 +27,6 @@ const MENU_POR_ROL = {
 
 // Permisos de Envíos (los mismos que aplica ms-envios; el backend es quien los exige)
 const ROLES_ESCRIBEN_ENVIOS = ['administrador', 'despacho'];
+// Permisos de Clientes (los mismos que aplica ms-clientes, el backend es quien los exige)
+const ROLES_ESCRIBEN_CLIENTES = ['administrador', 'despacho'];
 const ESTADOS_ENVIO = ['registrado', 'en_transito', 'entregado'];
