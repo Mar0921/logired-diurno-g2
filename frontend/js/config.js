@@ -6,6 +6,7 @@ const API_USUARIOS = 'http://localhost:3001';
 const API_CLIENTES = 'http://localhost:3002';
 const API_ENVIOS = 'http://localhost:3003';
 const API_CONDUCTORES = 'http://localhost:3004';
+const API_VEHICULOS = 'http://localhost:3005';
 
 const ROLES = ['administrador', 'despacho', 'flota'];
 
@@ -36,3 +37,7 @@ const ROLES_ESCRIBEN_CONDUCTORES = ['administrador', 'flota'];
 const SEDES_CONDUCTOR = ['Cali', 'Medellín', 'Bogotá'];
 const LICENCIAS_CONDUCTOR = ['C2', 'C3'];
 
+// Permisos de Vehículos (los mismos que aplica ms-vehiculos; el backend es quien los exige)
+const ROLES_ESCRIBEN_VEHICULOS = ['administrador', 'flota'];
+const TIPOS_VEHICULO = ['moto', 'furgon', 'camion'];
+const ESTADOS_VEHICULO = ['disponible', 'en_ruta', 'mantenimiento'];

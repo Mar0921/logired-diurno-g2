@@ -8,34 +8,28 @@
 </head>
 <body>
   <!-- =====================================================================
-       PANTALLA DE VEHÍCULOS (versión visual)
+       PANTALLA DE VEHÍCULOS
        Todos los roles consultan; administrador y flota crean, editan y eliminan.
-       Los datos de esta página son de ejemplo y están escritos en el HTML.
-       En el Taller 3 se reemplazan por los que entrega GET /vehiculos
-       (cada vehículo llega con su objeto conductor compuesto por ms-vehiculos).
+       Taller 2: la lista sale de los datos de ejemplo de datos/vehiculos.js.
+       Taller 3: los mismos datos llegarán de GET /vehiculos por el gateway
+       (cada vehículo con su objeto conductor, compuesto por ms-vehiculos).
        ===================================================================== -->
   <header class="barra">
     <div class="barra-superior">
       <span class="marca">LogiRed</span>
       <div class="persona">
-        <span><strong id="nombre-usuario">Fabio Flota</strong> <span class="rol" id="rol-usuario">flota</span></span>
+        <span><strong id="nombre-usuario"></strong> <span class="rol" id="rol-usuario"></span></span>
         <button id="cerrar-sesion" type="button">Cerrar sesión</button>
       </div>
     </div>
-    <!-- Menú del rol flota (en el Taller 3 lo pinta menu.js según el rol) -->
-    <nav id="menu" aria-label="Secciones">
-      <a href="inicio.html">Inicio</a>
-      <a href="conductores.html">Conductores</a>
-      <a href="vehiculos.html" aria-current="page">Vehículos</a>
-      <a href="envios.html">Envíos</a>
-    </nav>
+    <nav id="menu" aria-label="Secciones"></nav>
   </header>
 
   <main>
     <div class="cabecera-seccion">
       <div>
         <h1>Vehículos</h1>
-        <p class="resumen" id="resumen">4 vehículos</p>
+        <p class="resumen" id="resumen">Cargando…</p>
       </div>
       <div class="herramientas">
         <input id="buscar" type="search" placeholder="Buscar placa, tipo o conductor…" aria-label="Buscar vehículos">
@@ -43,19 +37,11 @@
       </div>
     </div>
 
-    <!-- Resumen de la flota por estado -->
-    <div class="tarjetas tarjetas-flota" aria-label="Vehículos por estado">
-      <div class="tarjeta"><strong>2</strong><span>disponibles</span></div>
-      <div class="tarjeta"><strong>1</strong><span>en ruta</span></div>
-      <div class="tarjeta"><strong>1</strong><span>en mantenimiento</span></div>
-    </div>
+    <!-- Resumen de la flota: estados, vehículos sin conductor y capacidad total -->
+    <div class="tarjetas tarjetas-flota" id="tarjetas" aria-label="Resumen de la flota"></div>
 
-    <div class="chips" id="chips" role="group" aria-label="Filtrar por estado">
-      <button type="button" class="chip activo" data-estado="">Todos <span class="cuenta">4</span></button>
-      <button type="button" class="chip" data-estado="disponible">disponible <span class="cuenta">2</span></button>
-      <button type="button" class="chip" data-estado="en_ruta">en ruta <span class="cuenta">1</span></button>
-      <button type="button" class="chip" data-estado="mantenimiento">mantenimiento <span class="cuenta">1</span></button>
-    </div>
+    <!-- Filtro por estado del vehículo -->
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por estado"></div>
 
     <div class="tabla-envoltura">
       <table class="tabla">
@@ -69,117 +55,20 @@
             <th scope="col" id="col-acciones"><span class="oculto">Acciones</span></th>
           </tr>
         </thead>
-        <tbody id="lista">
-          <tr>
-            <td data-etiqueta="Placa"><span class="placa">ABC123</span></td>
-            <td data-etiqueta="Tipo"><span class="tipo-vehiculo">Furgón</span></td>
-            <td data-etiqueta="Capacidad">1.500 kg</td>
-            <td data-etiqueta="Conductor">
-              <div class="cliente"><span class="avatar">C</span>
-                <div>Carlos Pérez<br><span class="sub">3001234567</span></div></div>
-            </td>
-            <td data-etiqueta="Estado"><span class="estado estado-disponible">disponible</span></td>
-            <td class="acciones">
-              <button class="boton boton-suave" type="button">Editar</button>
-              <button class="boton boton-peligro" type="button">Eliminar</button>
-            </td>
-          </tr>
-          <tr>
-            <td data-etiqueta="Placa"><span class="placa">XYZ45D</span></td>
-            <td data-etiqueta="Tipo"><span class="tipo-vehiculo">Moto</span></td>
-            <td data-etiqueta="Capacidad">30 kg</td>
-            <td data-etiqueta="Conductor">
-              <div class="cliente"><span class="avatar">A</span>
-                <div>Ana Gómez<br><span class="sub">3109876543</span></div></div>
-            </td>
-            <td data-etiqueta="Estado"><span class="estado estado-en_ruta">en ruta</span></td>
-            <td class="acciones">
-              <button class="boton boton-suave" type="button">Editar</button>
-              <button class="boton boton-peligro" type="button">Eliminar</button>
-            </td>
-          </tr>
-          <tr>
-            <td data-etiqueta="Placa"><span class="placa">KLM789</span></td>
-            <td data-etiqueta="Tipo"><span class="tipo-vehiculo">Camión</span></td>
-            <td data-etiqueta="Capacidad">8.000 kg</td>
-            <td data-etiqueta="Conductor">
-              <!-- conductor_id = null: el vehículo aún no tiene conductor asignado -->
-              <div class="cliente"><span class="avatar avatar-vacio">—</span>
-                <span class="sub">Sin conductor asignado</span></div>
-            </td>
-            <td data-etiqueta="Estado"><span class="estado estado-mantenimiento">mantenimiento</span></td>
-            <td class="acciones">
-              <button class="boton boton-suave" type="button">Editar</button>
-              <button class="boton boton-peligro" type="button">Eliminar</button>
-            </td>
-          </tr>
-          <tr>
-            <td data-etiqueta="Placa"><span class="placa">DEF456</span></td>
-            <td data-etiqueta="Tipo"><span class="tipo-vehiculo">Furgón</span></td>
-            <td data-etiqueta="Capacidad">1.200 kg</td>
-            <td data-etiqueta="Conductor">
-              <div class="cliente"><span class="avatar">L</span>
-                <div>Luis Rodríguez<br><span class="sub">3205556677</span></div></div>
-            </td>
-            <td data-etiqueta="Estado"><span class="estado estado-disponible">disponible</span></td>
-            <td class="acciones">
-              <button class="boton boton-suave" type="button">Editar</button>
-              <button class="boton boton-peligro" type="button">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="lista"></tbody>
       </table>
     </div>
   </main>
 
-  <!-- Formulario para registrar / editar un vehículo (se abrirá con el botón en el Taller 3).
-       Para verlo mientras se diseña, agregue el atributo open: <dialog id="dialogo" open> -->
-  <dialog id="dialogo">
-    <form class="formulario" method="dialog">
-      <h2>Registrar vehículo</h2>
-      <label class="campo"><span>Placa</span>
-        <input name="placa" placeholder="Ej.: ABC123 (motos: ABC12D)" maxlength="7" required>
-      </label>
-      <label class="campo"><span>Tipo</span>
-        <select name="tipo">
-          <option value="moto">moto</option>
-          <option value="furgon" selected>furgón</option>
-          <option value="camion">camión</option>
-        </select>
-      </label>
-      <label class="campo"><span>Capacidad (kg)</span>
-        <input name="capacidad_kg" type="number" min="1" placeholder="Ej.: 1200" required>
-      </label>
-      <label class="campo"><span>Estado</span>
-        <select name="estado">
-          <option value="disponible" selected>disponible</option>
-          <option value="en_ruta">en ruta</option>
-          <option value="mantenimiento">mantenimiento</option>
-        </select>
-      </label>
-      <label class="campo"><span>Conductor</span>
-        <select name="conductor_id">
-          <option value="">Sin conductor asignado</option>
-          <option value="1">Carlos Pérez</option>
-          <option value="2">Ana Gómez</option>
-          <option value="3">Luis Rodríguez</option>
-        </select>
-      </label>
-      <div class="acciones-form">
-        <button class="boton boton-suave" value="cancelar">Cancelar</button>
-        <button class="boton" value="guardar">Registrar vehículo</button>
-      </div>
-    </form>
-  </dialog>
   <div id="mensajes"></div>
+  <dialog id="dialogo"></dialog>
 
-  <!-- Taller 3: conectar con ms-vehiculos
   <script src="js/config.js"></script>
   <script src="js/sesion.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/menu.js"></script>
+  <script src="datos/vehiculos.js"></script>
   <script src="js/vehiculos.js"></script>
-  -->
 </body>
 </html>
