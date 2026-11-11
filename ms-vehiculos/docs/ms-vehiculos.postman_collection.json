@@ -687,6 +687,162 @@
           }
         }
       ]
+    },
+    {
+      "name": "19 · Relación: crear con un conductor que existe (trae el objeto conductor) → 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/vehiculos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"placa\": \"MNO345\",\n  \"tipo\": \"furgon\",\n  \"capacidad_kg\": 900,\n  \"conductor_id\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 201\", function () { pm.expect(pm.response.code).to.be.oneOf([201]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 · Relación: crear con un conductor que no existe → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/vehiculos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"placa\": \"PQR678\",\n  \"tipo\": \"moto\",\n  \"capacidad_kg\": 20,\n  \"conductor_id\": 99\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", function () { pm.expect(pm.response.code).to.be.oneOf([400]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 · Relación: obtener por id (trae el objeto conductor) → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/vehiculos/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 · Relación: listar (ms-conductores recibe UNA petición ?ids=) → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/vehiculos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 · Con ms-conductores DETENIDO: listar (conductor null + aviso) → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base}}/vehiculos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 · Con ms-conductores DETENIDO: crear → 503",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base}}/vehiculos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"placa\": \"VWX234\",\n  \"tipo\": \"camion\",\n  \"capacidad_kg\": 3000,\n  \"conductor_id\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 503\", function () { pm.expect(pm.response.code).to.be.oneOf([503]); });"
+            ]
+          }
+        }
+      ]
     }
   ]
 }
