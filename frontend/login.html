@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LogiRed · Iniciar sesión</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div class="entrada">
+    <section class="sala">
+      <h1>LogiRed</h1>
+      <p>Clientes, envíos, conductores y vehículos de la empresa, en un solo lugar.</p>
+    </section>
+    <section class="acceso">
+      <form id="form-login" novalidate>
+        <h2>Iniciar sesión</h2>
+        <p class="indicacion">Use el email y la contraseña de su cuenta.</p>
+        <label class="campo"><span>Email</span>
+          <input name="email" type="email" autocomplete="username" required>
+        </label>
+        <label class="campo"><span>Contraseña</span>
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="boton" type="submit">Entrar</button>
+        <p class="error-acceso" id="error-login" role="alert"></p>
+      </form>
+    </section>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById('form-login');
+    const error = document.getElementById('error-login');
+
+    // Si ya hay sesión, ir directo a la página del rol
+    const yaEntro = usuarioActual();
+    if (yaEntro) location.href = PAGINA_POR_ROL[yaEntro.rol];
+
+    form.onsubmit = async (evento) => {
+      evento.preventDefault();
+      error.textContent = '';
+      const email = form.elements.email.value.trim();
+      const password = form.elements.password.value;
+      if (!email || !password) {
+        error.textContent = 'Escriba el email y la contraseña.';
+        return;
+      }
+      try {
+        await iniciarSesion(email, password);
+      } catch (e) {
+        error.textContent = e.status === 401 ? 'Email o contraseña incorrectos.' : e.message;
+      }
+    };
+  </script>
+</body>
+</html>
