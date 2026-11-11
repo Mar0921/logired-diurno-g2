@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LogiRed · Clientes</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <!-- =====================================================================
+       PANTALLA DE CLIENTES
+       Todos los roles consultan; administrador y despacho crean, editan y eliminan.
+       Taller 2: la lista sale de los datos de ejemplo de datos/clientes.js.
+       Taller 3: los mismos datos llegarán de GET /clientes por el gateway.
+       ===================================================================== -->
+  <header class="barra">
+    <div class="barra-superior">
+      <span class="marca">LogiRed</span>
+      <div class="persona">
+        <span><strong id="nombre-usuario"></strong> <span class="rol" id="rol-usuario"></span></span>
+        <button id="cerrar-sesion" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+    <nav id="menu" aria-label="Secciones"></nav>
+  </header>
+
+  <main>
+    <div class="cabecera-seccion">
+      <div>
+        <h1>Clientes</h1>
+        <p class="resumen" id="resumen">Cargando…</p>
+      </div>
+      <div class="herramientas">
+        <input id="buscar" type="search" placeholder="Buscar nombre, documento o ciudad…" aria-label="Buscar clientes">
+        <button class="boton" id="nuevo">Crear cliente</button>
+      </div>
+    </div>
+
+    <!-- Resumen de la cartera de clientes -->
+    <div class="tarjetas tarjetas-clientes" id="tarjetas" aria-label="Resumen de clientes"></div>
+
+    <!-- Filtro por ciudad: se arma con las ciudades que haya en la lista -->
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por ciudad"></div>
+
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Cliente</th>
+            <th scope="col">Documento</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Email</th>
+            <th scope="col">Ciudad</th>
+            <th scope="col" id="col-acciones"><span class="oculto">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="mensajes"></div>
+  <dialog id="dialogo"></dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="datos/clientes.js"></script>
+  <script src="js/clientes.js"></script>
+</body>
+</html>
