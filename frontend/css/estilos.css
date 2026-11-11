@@ -191,3 +191,20 @@ dialog::backdrop { background:rgba(15,47,77,.5); backdrop-filter:blur(2px); }
 .tarjetas-flota .tarjeta:nth-child(2)::before { background:#e0a100; }
 .tarjetas-flota .tarjeta:nth-child(3)::before { background:var(--peligro); }
 .tarjetas-flota .tarjeta span { text-transform:none; }
+
+/* ---------- Pantalla de clientes ---------- */
+/* El documento y el teléfono no se parten en dos líneas */
+.tabla td[data-etiqueta="Documento"],
+.tabla td[data-etiqueta="Teléfono"] { white-space:nowrap; font-variant-numeric:tabular-nums; }
+/* El email es lo único largo: se parte para que la fila no desborde la tabla */
+.tabla td[data-etiqueta="Email"] { overflow-wrap:anywhere; }
+/* Las acciones ocupan solo lo que miden sus botones (en celular la fila es tarjeta) */
+@media (min-width:641px) {
+  .tabla td.acciones, .tabla th:last-child { width:1%; }
+}
+/* Ciudad: misma etiqueta redondeada que el rol */
+.ciudad { display:inline-flex; align-items:center; padding:.2rem .7rem; border-radius:999px;
+  font-size:.78rem; font-weight:600; color:var(--azul-700); background:var(--azul-100); }
+/* Resumen de clientes: mismas tarjetas del inicio */
+.tarjetas-clientes { margin-bottom:1.25rem; }
+.tarjetas-clientes .tarjeta span { text-transform:none; }
