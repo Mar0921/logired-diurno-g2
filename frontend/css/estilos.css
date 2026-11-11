@@ -174,3 +174,20 @@ dialog::backdrop { background:rgba(15,47,77,.5); backdrop-filter:blur(2px); }
   .tabla td.acciones,.tabla td.vacio { display:flex; justify-content:flex-end; border-bottom:0; }
   .tabla td.acciones::before,.tabla td.vacio::before { content:none; }
 }
+
+/* ---------- Pantalla de vehículos ---------- */
+/* Estados del vehículo: disponible (verde), en ruta (ámbar), mantenimiento (rojo) */
+.estado-disponible { color:var(--ok); background:var(--ok-fondo); }
+.estado-en_ruta { color:var(--alerta); background:var(--alerta-fondo); }
+.estado-mantenimiento { color:var(--peligro); background:var(--peligro-fondo); }
+/* Placa con aspecto de placa colombiana (amarilla con borde) */
+.placa { display:inline-block; padding:.15rem .55rem; border:2px solid var(--texto); border-radius:6px;
+  font-weight:700; letter-spacing:.08em; color:var(--texto); background:#ffd84d; font-variant-numeric:tabular-nums; }
+.tipo-vehiculo { font-weight:500; }
+.avatar-vacio { color:var(--suave); background:#eef1f5; }
+/* Tarjetas de resumen de la flota: mismo estilo de inicio, con el color de cada estado */
+.tarjetas-flota { margin-bottom:1.25rem; }
+.tarjetas-flota .tarjeta::before { background:var(--ok); }
+.tarjetas-flota .tarjeta:nth-child(2)::before { background:#e0a100; }
+.tarjetas-flota .tarjeta:nth-child(3)::before { background:var(--peligro); }
+.tarjetas-flota .tarjeta span { text-transform:none; }
