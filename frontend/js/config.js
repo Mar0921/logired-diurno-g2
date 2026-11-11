@@ -5,6 +5,7 @@
 const API_USUARIOS = 'http://localhost:3001';
 const API_CLIENTES = 'http://localhost:3002';
 const API_ENVIOS = 'http://localhost:3003';
+const API_CONDUCTORES = 'http://localhost:3004';
 
 const ROLES = ['administrador', 'despacho', 'flota'];
 
@@ -30,3 +31,8 @@ const ROLES_ESCRIBEN_ENVIOS = ['administrador', 'despacho'];
 // Permisos de Clientes (los mismos que aplica ms-clientes, el backend es quien los exige)
 const ROLES_ESCRIBEN_CLIENTES = ['administrador', 'despacho'];
 const ESTADOS_ENVIO = ['registrado', 'en_transito', 'entregado'];
+
+const ROLES_ESCRIBEN_CONDUCTORES = ['administrador', 'flota'];
+const SEDES_CONDUCTOR = ['Cali', 'Medellín', 'Bogotá'];
+const LICENCIAS_CONDUCTOR = ['C2', 'C3'];
+
