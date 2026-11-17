@@ -16,6 +16,9 @@ const NOMBRE_ESTADO = (e) => e.replace('_', ' ');
 
 // Los mismos atributos del contrato de la API. El conductor se escoge de la
 // lista; la opción vacía significa "sin conductor asignado" (conductor_id: null).
+let conductoresAsignables = [];
+
+
 const CAMPOS = [
   { nombre: 'placa', etiqueta: 'Placa', ayuda: 'Ej.: ABC123 (motos: ABC12D)' },
   { nombre: 'tipo', etiqueta: 'Tipo', tipo: 'select',
@@ -24,8 +27,7 @@ const CAMPOS = [
   { nombre: 'estado', etiqueta: 'Estado', tipo: 'select',
     opciones: ESTADOS_VEHICULO.map((e) => ({ valor: e, texto: NOMBRE_ESTADO(e) })) },
   { nombre: 'conductor_id', etiqueta: 'Conductor', tipo: 'select',
-    opciones: [{ valor: '', texto: 'Sin conductor asignado' },
-      ...CONDUCTORES_ASIGNABLES.map((c) => ({ valor: c.id, texto: c.nombre }))] },
+    opciones: [{ valor: '', texto: 'Sin conductor asignado' }] }
 ];
 
 // El formulario entrega texto; la API espera números, la placa en
@@ -52,59 +54,29 @@ const aCuerpo = (d) => ({
 // aplica en el servidor, para que la pantalla se comporte igual después.
 // =====================================================================
 
-function leerVehiculos() {
-  return VEHICULOS_EJEMPLO.map((v) => ({ ...v }));
+const VEH = { base: API_VEHICULOS, servicio: 'ms-vehiculos' };
+const CON = { base: API_CONDUCTORES, servicio: 'ms-conductores' };
+
+
+
+async function leerVehiculos() {
+  return await api('/', VEH) || [];
 }
 
-// Mismas validaciones del modelo de ms-vehiculos (400)
-function validar(cuerpo) {
-  const errores = [];
-  if (!/^[A-Z]{3}[0-9]{2}[A-Z0-9]$/.test(cuerpo.placa)) {
-    errores.push('placa es obligatoria y debe tener formato ABC123 (o ABC12D para motos)');
-  }
-  if (!(cuerpo.capacidad_kg > 0)) errores.push('capacidad_kg es obligatoria y debe ser un número mayor que 0');
-  if (errores.length) throw new ErrorApi(400, 'Datos inválidos', errores);
+async function leerConductores() {
+  return await api('/', CON) || [];
 }
 
-// Regla de negocio de ms-vehiculos: placa única (409)
-function placaRepetida(placa, idPropio) {
-  return vehiculos.some((v) => v.placa === placa && v.id !== idPropio);
+async function guardarVehiculo(cuerpo) {
+  return await api('/', { ...VEH, method: 'POST', body: cuerpo });
 }
 
-// Lo que hace ms-vehiculos con ms-conductores: valida que el conductor
-// exista (400) y agrega el objeto conductor a la respuesta.
-function componerConductor(cuerpo) {
-  if (cuerpo.conductor_id === null) return { ...cuerpo, conductor: null };
-  const conductor = CONDUCTORES_ASIGNABLES.find((c) => c.id === cuerpo.conductor_id);
-  if (!conductor) throw new ErrorApi(400, `No existe el conductor con id ${cuerpo.conductor_id}`);
-  return { ...cuerpo, conductor: { ...conductor } };
+async function cambiarVehiculo(id, cuerpo) {
+  return await api(`/${id}`, { ...VEH, method: 'PUT', body: cuerpo });
 }
 
-function guardarVehiculo(cuerpo) {
-  validar(cuerpo);
-  if (placaRepetida(cuerpo.placa, null)) {
-    throw new ErrorApi(409, `Ya existe un vehículo con la placa ${cuerpo.placa}`);
-  }
-  const nuevo = { id: Math.max(0, ...vehiculos.map((v) => v.id)) + 1, ...componerConductor(cuerpo) };
-  vehiculos.push(nuevo);
-  return nuevo;
-}
-
-function cambiarVehiculo(id, cuerpo) {
-  validar(cuerpo);
-  if (placaRepetida(cuerpo.placa, id)) {
-    throw new ErrorApi(409, `Ya existe un vehículo con la placa ${cuerpo.placa}`);
-  }
-  const indice = vehiculos.findIndex((v) => v.id === id);
-  if (indice < 0) throw new ErrorApi(404, `No existe el vehículo con id ${id}`);
-  vehiculos[indice] = { id, ...componerConductor(cuerpo) };
-  return vehiculos[indice];
-}
-
-function borrarVehiculo(id) {
-  const indice = vehiculos.findIndex((v) => v.id === id);
-  if (indice < 0) throw new ErrorApi(404, `No existe el vehículo con id ${id}`);
-  vehiculos.splice(indice, 1);
+async function borrarVehiculo(id) {
+  return await api(`/${id}`, { ...VEH, method: 'DELETE' });
 }
 
 // =====================================================================
@@ -180,38 +152,25 @@ function pintar() {
   }
 }
 
-// =====================================================================
-// ACCIONES DE LA PANTALLA
-// =====================================================================
-
-function cargar() {
-  try {
-    vehiculos = leerVehiculos();
-    pintar();
-  } catch (error) {
-    document.getElementById('resumen').textContent = 'No se pudo cargar la lista de vehículos.';
-    mostrarError(error);
-  }
-}
 
 async function crear() {
-  const datos = await pedirDatos('Registrar vehículo', CAMPOS,
-    { tipo: 'furgon', estado: 'disponible', conductor_id: '' }, 'Registrar vehículo');
+  const datos = await pedirDatos('Registrar vehículo', CAMPOS, {}, 'Registrar vehículo');
   if (!datos) return;
   try {
-    const nuevo = guardarVehiculo(aCuerpo(datos));
+    const nuevo = await guardarVehiculo(aCuerpo(datos));
+    vehiculos = await leerVehiculos();
     mostrarMensaje(`Vehículo registrado: ${nuevo.placa}`);
     pintar();
   } catch (error) { mostrarError(error); }
 }
 
 async function editar(v) {
-  const datos = await pedirDatos(`Editar vehículo ${v.placa}`, CAMPOS,
-    { ...v, conductor_id: v.conductor_id ?? '' }, 'Guardar cambios');
+  const datos = await pedirDatos(`Editar vehículo ${v.placa}`, CAMPOS, v, 'Guardar cambios');
   if (!datos) return;
   try {
-    cambiarVehiculo(v.id, aCuerpo(datos));
-    mostrarMensaje('Cambios guardados');
+    await cambiarVehiculo(v.id, aCuerpo(datos));
+    vehiculos = await leerVehiculos();
+    mostrarMensaje(`Vehículo actualizado: ${v.placa}`);
     pintar();
   } catch (error) { mostrarError(error); }
 }
@@ -219,10 +178,47 @@ async function editar(v) {
 async function eliminar(v) {
   if (!(await confirmar(`¿Eliminar el vehículo ${v.placa}?`, 'Eliminar vehículo'))) return;
   try {
-    borrarVehiculo(v.id);
+    await borrarVehiculo(v.id);
+    vehiculos = await leerVehiculos();
     mostrarMensaje(`Vehículo eliminado: ${v.placa}`);
     pintar();
   } catch (error) { mostrarError(error); }
+}
+
+// =====================================================================
+// ACCIONES DE LA PANTALLA
+// =====================================================================
+
+async function cargar() {
+  try {
+    // Los vehículos son la información principal de esta pantalla.
+    vehiculos = await leerVehiculos();
+
+    // Los conductores alimentan el selector y son complementarios.
+    try {
+      conductoresAsignables = await leerConductores() || [];
+    } catch (error) {
+      conductoresAsignables = [];
+      mostrarMensaje(
+        'No se pudo consultar ms-conductores. Puedes consultar los vehículos, pero no asignar conductores nuevos.',
+        'error'
+      );
+    }
+
+    CAMPOS[4].opciones = [
+      { valor: '', texto: 'Sin conductor asignado' },
+      ...conductoresAsignables.map((c) => ({
+        valor: c.id,
+        texto: c.nombre
+      }))
+    ];
+
+    pintar();
+  } catch (error) {
+    document.getElementById('resumen').textContent =
+      'No se pudo cargar la lista de vehículos.';
+    mostrarError(error);
+  }
 }
 
 // =====================================================================

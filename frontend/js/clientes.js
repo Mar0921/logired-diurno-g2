@@ -12,6 +12,7 @@ let ciudadActiva = '';   // '' = todas
 let texto = '';
 
 // Los mismos atributos del contrato de la API: email es el único opcional
+const CLI = {base: API_CLIENTES, servicio: 'ms-clientes' };
 const CAMPOS = [
   { nombre: 'nombre', etiqueta: 'Nombre', ayuda: 'Ej.: Distribuidora El Valle' },
   { nombre: 'documento', etiqueta: 'Documento', ayuda: 'Ej.: 900456789-1' },
@@ -31,50 +32,34 @@ const aCuerpo = (d) => ({
 });
 
 // =====================================================================
-// ORIGEN DE LOS DATOS
-// Todo lo que toca los datos está en este bloque y en ningún otro lado.
-// En el Taller 3 solo cambian estas cuatro funciones por su llamada a la
-// API y el resto del archivo queda igual:
-//   leerClientes()             → api('/clientes', CLI)
-//   guardarCliente(cuerpo)     → api('/clientes', { ...CLI, method: 'POST', body: cuerpo })
-//   cambiarCliente(id, cuerpo) → api(`/clientes/${id}`, { ...CLI, method: 'PUT', body: cuerpo })
-//   borrarCliente(id)          → api(`/clientes/${id}`, { ...CLI, method: 'DELETE' })
-// donde CLI = { base: API_CLIENTES, servicio: 'ms-clientes' }.
-// Las reglas de negocio que se repiten aquí son las mismas que ms-clientes
-// aplica en el servidor, para que la pantalla se comporte igual después.
+// ORIGEN DE LOS DATOS - API ms-clientes
 // =====================================================================
 
-function leerClientes() {
-  return CLIENTES_EJEMPLO.map((c) => ({ ...c }));
+async function leerClientes() {
+  return await api('/', CLI);
 }
 
-function documentoRepetido(documento, idPropio) {
-  return clientes.some((c) => c.documento === documento && c.id !== idPropio);
+async function guardarCliente(cuerpo) {
+  return await api('/', {
+    ...CLI,
+    method: 'POST',
+    body: cuerpo
+  });
 }
 
-function guardarCliente(cuerpo) {
-  if (documentoRepetido(cuerpo.documento, null)) {
-    throw new ErrorApi(409, `Ya existe un cliente con el documento ${cuerpo.documento}`);
-  }
-  const nuevo = { id: Math.max(0, ...clientes.map((c) => c.id)) + 1, ...cuerpo };
-  clientes.push(nuevo);
-  return nuevo;
+async function cambiarCliente(id, cuerpo) {
+  return await api(`/${id}`, {
+    ...CLI,
+    method: 'PUT',
+    body: cuerpo
+  });
 }
 
-function cambiarCliente(id, cuerpo) {
-  if (documentoRepetido(cuerpo.documento, id)) {
-    throw new ErrorApi(409, `Ya existe un cliente con el documento ${cuerpo.documento}`);
-  }
-  const indice = clientes.findIndex((c) => c.id === id);
-  if (indice < 0) throw new ErrorApi(404, `No existe el cliente con id ${id}`);
-  clientes[indice] = { id, ...cuerpo };
-  return clientes[indice];
-}
-
-function borrarCliente(id) {
-  const indice = clientes.findIndex((c) => c.id === id);
-  if (indice < 0) throw new ErrorApi(404, `No existe el cliente con id ${id}`);
-  clientes.splice(indice, 1);
+async function borrarCliente(id) {
+  return await api(`/${id}`, {
+    ...CLI,
+    method: 'DELETE'
+  });
 }
 
 // =====================================================================
@@ -143,12 +128,13 @@ function pintar() {
 // ACCIONES DE LA PANTALLA
 // =====================================================================
 
-function cargar() {
+async function cargar() {
   try {
-    clientes = leerClientes();
+    clientes = await leerClientes();
     pintar();
   } catch (error) {
-    document.getElementById('resumen').textContent = 'No se pudo cargar la lista de clientes.';
+    document.getElementById('resumen').textContent =
+      'No se pudo cargar la lista de clientes.';
     mostrarError(error);
   }
 }
@@ -157,7 +143,7 @@ async function crear() {
   const datos = await pedirDatos('Crear cliente', CAMPOS, {}, 'Crear cliente');
   if (!datos) return;
   try {
-    const nuevo = guardarCliente(aCuerpo(datos));
+    const nuevo = await guardarCliente(aCuerpo(datos));
     mostrarMensaje(`Cliente creado: ${nuevo.nombre}`);
     pintar();
   } catch (error) { mostrarError(error); }
@@ -167,7 +153,7 @@ async function editar(c) {
   const datos = await pedirDatos(`Editar ${c.nombre}`, CAMPOS, c, 'Guardar cambios');
   if (!datos) return;
   try {
-    cambiarCliente(c.id, aCuerpo(datos));
+    await cambiarCliente(c.id, aCuerpo(datos));
     mostrarMensaje('Cambios guardados');
     pintar();
   } catch (error) { mostrarError(error); }
@@ -176,7 +162,7 @@ async function editar(c) {
 async function eliminar(c) {
   if (!(await confirmar(`¿Eliminar el cliente ${c.nombre}?`, 'Eliminar cliente'))) return;
   try {
-    borrarCliente(c.id);
+    await borrarCliente(c.id);
     mostrarMensaje(`Cliente eliminado: ${c.nombre}`);
     pintar();
   } catch (error) { mostrarError(error); }

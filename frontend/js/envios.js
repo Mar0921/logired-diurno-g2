@@ -72,7 +72,7 @@ function pintar() {
 
 async function cargar() {
   try {
-    envios = await api('/envios', ENV) || [];
+    envios = await api('/', ENV) || [];
     pintar();
   } catch (error) {
     document.getElementById('resumen').textContent = 'No se pudo cargar la lista de envíos.';
@@ -84,7 +84,7 @@ async function crear() {
   const datos = await pedirDatos('Crear envío', camposEnvio(false), { estado: 'registrado' }, 'Crear envío');
   if (!datos) return;
   try {
-    const nuevo = await api('/envios', { ...ENV, method: 'POST', body: aCuerpo(datos) });
+    const nuevo = await api('/', { ...ENV, method: 'POST', body: aCuerpo(datos) });
     mostrarMensaje(`Envío creado: ${nuevo.numero_guia}`);
     cargar();
   } catch (error) { mostrarError(error); }
@@ -94,7 +94,7 @@ async function editar(e) {
   const datos = await pedirDatos('Editar envío', camposEnvio(true), e);
   if (!datos) return;
   try {
-    await api(`/envios/${e.id}`, { ...ENV, method: 'PUT', body: aCuerpo(datos) });
+    await api(`/${e.id}`, { ...ENV, method: 'PUT', body: aCuerpo(datos) });
     mostrarMensaje('Cambios guardados');
     cargar();
   } catch (error) { mostrarError(error); }
@@ -103,7 +103,7 @@ async function editar(e) {
 async function eliminar(e) {
   if (!(await confirmar(`¿Eliminar el envío ${e.numero_guia}?`, 'Eliminar envío'))) return;
   try {
-    await api(`/envios/${e.id}`, { ...ENV, method: 'DELETE' });
+    await api(`/${e.id}`, { ...ENV, method: 'DELETE' });
     mostrarMensaje(`Envío eliminado: ${e.numero_guia}`);
     cargar();
   } catch (error) { mostrarError(error); }

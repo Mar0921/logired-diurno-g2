@@ -2,11 +2,11 @@
 // CONFIGURACIÓN DEL FRONTEND: direcciones de las APIs, roles y menú.
 // En el Taller 3, detrás del gateway, las direcciones pasan a '/api/...'.
 // =====================================================================
-const API_USUARIOS = 'http://localhost:3001';
-const API_CLIENTES = 'http://localhost:3002';
-const API_ENVIOS = 'http://localhost:3003';
-const API_CONDUCTORES = 'http://localhost:3004';
-const API_VEHICULOS = 'http://localhost:3005';
+const API_USUARIOS = '/api/usuarios';
+const API_CLIENTES = '/api/clientes';
+const API_ENVIOS = '/api/envios';
+const API_CONDUCTORES = '/api/conductores';
+const API_VEHICULOS = '/api/vehiculos';
 
 const ROLES = ['administrador', 'despacho', 'flota'];
 

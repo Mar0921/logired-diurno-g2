@@ -15,7 +15,7 @@ async function iniciarSesion(email, password) {
   let token;
   let usuario;
   try {
-    ({ token, usuario } = await api('/usuarios/login', {
+    ({ token, usuario } = await api('/login', {
       method: 'POST',
       body: { email, password },
     }));

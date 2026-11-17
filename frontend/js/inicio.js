@@ -3,7 +3,7 @@ const yo = exigirSesion();
 
 async function cargarResumen() {
   try {
-    const envios = await api('/envios', { base: API_ENVIOS, servicio: 'ms-envios' });
+    const envios = await api('/', { base: API_ENVIOS, servicio: 'ms-envios' });
     if (!envios) return;
     document.getElementById('resumen').innerHTML = ESTADOS_ENVIO.map((estado) => `
       <div class="tarjeta"><strong>${envios.filter((e) => e.estado === estado).length}</strong>
