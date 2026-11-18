@@ -11,6 +11,17 @@
       "item": [
         {
           "name": "Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -19,7 +30,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{ \"email\": \"admin@empresa.com\", \"password\": \"Admin2026*\" }",
+              "raw": "{ \"email\": \"admin@empresa.com\", \"password\": \"AdminLogired2026\" }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -27,14 +38,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3001/usuarios/login",
-              "protocol": "http",
+              "raw": "{{usuarios}}/login",
               "host": [
-                "localhost"
+                "{{usuarios}}"
               ],
-              "port": "3001",
               "path": [
-                "usuarios",
                 "login"
               ]
             }
@@ -43,6 +51,17 @@
         },
         {
           "name": "Login despacho",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"token_despacho\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -59,14 +78,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3001/usuarios/login",
-              "protocol": "http",
+              "raw": "{{usuarios}}/login",
               "host": [
-                "localhost"
+                "{{usuarios}}"
               ],
-              "port": "3001",
               "path": [
-                "usuarios",
                 "login"
               ]
             }
@@ -75,6 +91,17 @@
         },
         {
           "name": "Login flota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"token_flota\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -91,14 +118,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3001/usuarios/login",
-              "protocol": "http",
+              "raw": "{{usuarios}}/login",
               "host": [
-                "localhost"
+                "{{usuarios}}"
               ],
-              "port": "3001",
               "path": [
-                "usuarios",
                 "login"
               ]
             }
@@ -130,14 +154,9 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3001/usuarios",
-              "protocol": "http",
+              "raw": "{{usuarios}}",
               "host": [
-                "localhost"
-              ],
-              "port": "3001",
-              "path": [
-                "usuarios"
+                "{{usuarios}}"
               ]
             }
           },
@@ -168,14 +187,9 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3001/usuarios",
-              "protocol": "http",
+              "raw": "{{usuarios}}",
               "host": [
-                "localhost"
-              ],
-              "port": "3001",
-              "path": [
-                "usuarios"
+                "{{usuarios}}"
               ]
             }
           },
@@ -208,14 +222,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -227,14 +236,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes?ciudad=Cali",
-          "protocol": "http",
+          "raw": "{{base}}?ciudad=Cali",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ],
           "query": [
             {
@@ -252,14 +256,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes?ids=1,3,4",
-          "protocol": "http",
+          "raw": "{{base}}?ids=1,3,4",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ],
           "query": [
             {
@@ -277,14 +276,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes/2",
-          "protocol": "http",
+          "raw": "{{base}}/2",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "2"
           ]
         }
@@ -297,14 +293,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes/99",
-          "protocol": "http",
+          "raw": "{{base}}/99",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "99"
           ]
         }
@@ -317,14 +310,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes/abc",
-          "protocol": "http",
+          "raw": "{{base}}/abc",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "abc"
           ]
         }
@@ -338,7 +328,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"nombre\": \"Logistica Vallecaucana\",\r\n  \"documento\": \"901445566-8\",\r\n  \"telefono\": \"3146677889\",\r\n  \"email\": \"operaciones@logisticavallecaucana.com\",\r\n  \"ciudad\": \"Yumbo\"\r\n}",
+          "raw": "{\r\n  \"nombre\": \"Agroinsumos del Cauca\",\r\n  \"documento\": \"900887766-2\",\r\n  \"telefono\": \"3209988776\",\r\n  \"email\": \"pedidos@agroinsumoscauca.com\",\r\n  \"ciudad\": \"Popayán\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -346,14 +336,9 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -374,14 +359,9 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -402,14 +382,9 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -430,14 +405,11 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes/2",
-          "protocol": "http",
+          "raw": "{{base}}/2",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "2"
           ]
         }
@@ -459,14 +431,11 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes/99",
-          "protocol": "http",
+          "raw": "{{base}}/99",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "99"
           ]
         }
@@ -479,14 +448,11 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes/4",
-          "protocol": "http",
+          "raw": "{{base}}/4",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "4"
           ]
         }
@@ -499,14 +465,11 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes/4",
-          "protocol": "http",
+          "raw": "{{base}}/4",
           "host": [
-            "localhost"
+            "{{base}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes",
             "4"
           ]
         }
@@ -522,14 +485,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -551,14 +509,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -580,14 +533,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -618,14 +566,9 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
-          ],
-          "port": "3002",
-          "path": [
-            "clientes"
+            "{{base}}"
           ]
         }
       },
@@ -656,14 +599,35 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/clientes",
-          "protocol": "http",
+          "raw": "{{base}}",
           "host": [
-            "localhost"
+            "{{base}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19 - Cambiar contraseña del administrador",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Administrador General\",\r\n  \"email\": \"admin@empresa.com\",\r\n  \"rol\": \"administrador\",\r\n  \"activo\": true,\r\n  \"password\": \"AdminLogired2026\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{usuarios}}/1",
+          "host": [
+            "{{usuarios}}"
           ],
-          "port": "3002",
           "path": [
-            "clientes"
+            "1"
           ]
         }
       },
@@ -691,19 +655,15 @@
     },
     {
       "key": "token",
-      "secret": true
+      "value": ""
     },
     {
       "key": "token_despacho",
-      "secret": true
+      "value": ""
     },
     {
       "key": "token_flota",
       "value": ""
-    },
-    {
-      "key": "json_web_token_0pgl",
-      "secret": true
     }
   ]
 }
