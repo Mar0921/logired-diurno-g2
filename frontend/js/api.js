@@ -33,11 +33,19 @@ async function api(ruta, opciones = {}) {
     throw new ErrorApi(0, `No hay conexión con ${servicio}. ¿Está corriendo?`);
   }
 
-  if (respuesta.status === 401 && ruta !== '/usuarios/login') {
+  if (respuesta.status === 401 && ruta !== '/login') {
     cerrarSesion();                    // sin sesión o token vencido: volver a entrar
     return null;
   }
-  const datos = respuesta.status === 204 ? null : await respuesta.json();
-  if (!respuesta.ok) throw new ErrorApi(respuesta.status, datos.error, datos.detalles);
+  // El gateway responde 503 en HTML cuando el microservicio está caído,
+  // así que la respuesta puede no ser JSON.
+  const datos = respuesta.status === 204 ? null : await respuesta.json().catch(() => null);
+  if (!respuesta.ok) {
+    throw new ErrorApi(
+      respuesta.status,
+      (datos && datos.error) || `El servicio no está disponible (${respuesta.status})`,
+      datos && datos.detalles,
+    );
+  }
   return datos;
 }

@@ -1,8 +1,7 @@
 // =====================================================================
 // PANTALLA DE CLIENTES
 // Consultan todos los roles; crean, editan y eliminan administrador y despacho.
-// Taller 2: los datos salen del archivo de ejemplo datos/clientes.js.
-// Taller 3: los mismos datos llegarán de ms-clientes por el gateway.
+// Todas las llamadas pasan por el gateway: /api/clientes.
 // =====================================================================
 const yo = exigirSesion();
 const puedeEscribir = yo && ROLES_ESCRIBEN_CLIENTES.includes(yo.rol);
@@ -145,7 +144,7 @@ async function crear() {
   try {
     const nuevo = await guardarCliente(aCuerpo(datos));
     mostrarMensaje(`Cliente creado: ${nuevo.nombre}`);
-    pintar();
+    await cargar();
   } catch (error) { mostrarError(error); }
 }
 
@@ -155,7 +154,7 @@ async function editar(c) {
   try {
     await cambiarCliente(c.id, aCuerpo(datos));
     mostrarMensaje('Cambios guardados');
-    pintar();
+    await cargar();
   } catch (error) { mostrarError(error); }
 }
 
@@ -164,7 +163,7 @@ async function eliminar(c) {
   try {
     await borrarCliente(c.id);
     mostrarMensaje(`Cliente eliminado: ${c.nombre}`);
-    pintar();
+    await cargar();
   } catch (error) { mostrarError(error); }
 }
 
