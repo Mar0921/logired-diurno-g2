@@ -1,0 +1,319 @@
+{
+  "clientName": "Thunder Client",
+  "info": {
+    "name": "ms-conductores - Taller 2 Completo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:3004"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "token_despacho",
+      "value": ""
+    },
+    {
+      "key": "token_flota",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · LOGIN (ms-usuarios)",
+      "item": [
+        {
+          "name": "00a · Login admin (guarda token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "http://localhost:3001/usuarios/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@empresa.com\",\n  \"password\": \"Admin2026*\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "auth": { "type": "noauth" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set(\"token\", data.token);",
+                  "  tc.setVar('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00b · Login despacho (guarda token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "http://localhost:3001/usuarios/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"despacho@empresa.com\",\n  \"password\": \"LogiRed2026\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "auth": { "type": "noauth" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set(\"token_despacho\", data.token);",
+                  "  tc.setVar('token_despacho', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00c · Login flota (guarda token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "http://localhost:3001/usuarios/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"flota@empresa.com\",\n  \"password\": \"LogiRed2026\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "auth": { "type": "noauth" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set(\"token_flota\", data.token);",
+                  "  tc.setVar('token_flota', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 · CRUD (Casos 1 a 13)",
+      "item": [
+        {
+          "name": "01 · Listar todos → 200",
+          "request": { "method": "GET", "url": "{{base}}/conductores" }
+        },
+        {
+          "name": "02 · Filtrar por sede → 200",
+          "request": { "method": "GET", "url": "{{base}}/conductores?sede=Cali" }
+        },
+        {
+          "name": "03 · Consultar por lotes → 200",
+          "request": { "method": "GET", "url": "{{base}}/conductores?ids=1,3" }
+        },
+        {
+          "name": "04 · Obtener existente → 200",
+          "request": { "method": "GET", "url": "{{base}}/conductores/1" }
+        },
+        {
+          "name": "05 · Obtener inexistente → 404",
+          "request": { "method": "GET", "url": "{{base}}/conductores/99" }
+        },
+        {
+          "name": "06 · Obtener con id no numérico → 400",
+          "request": { "method": "GET", "url": "{{base}}/conductores/abc" }
+        },
+        {
+          "name": "07 · Crear válido → 201",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pedro Picapiedra\",\n  \"cedula\": \"999888777\",\n  \"categoria_licencia\": \"C3\",\n  \"telefono\": \"3150001122\",\n  \"sede\": \"Medellín\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "08 · Crear sin datos obligatorios → 400",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores",
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "09 · Crear con cédula repetida → 409",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otro Conductor\",\n  \"cedula\": \"12345678\",\n  \"categoria_licencia\": \"C2\",\n  \"telefono\": \"3000000000\",\n  \"sede\": \"Bogotá\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "10 · Actualizar existente → 200",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Pérez Modificado\",\n  \"cedula\": \"12345678\",\n  \"categoria_licencia\": \"C2\",\n  \"telefono\": \"3111111111\",\n  \"sede\": \"Cali\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "11 · Actualizar inexistente → 404",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores/99",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nadie\",\n  \"cedula\": \"000\",\n  \"categoria_licencia\": \"C3\",\n  \"telefono\": \"300\",\n  \"sede\": \"Bogotá\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "12 · Eliminar existente → 204",
+          "request": { "method": "DELETE", "url": "{{base}}/conductores/3" }
+        },
+        {
+          "name": "13 · Eliminar otra vez → 404",
+          "request": { "method": "DELETE", "url": "{{base}}/conductores/3" }
+        }
+      ]
+    },
+    {
+      "name": "02 · Seguridad (Casos 14 a 18)",
+      "item": [
+        {
+          "name": "14 · Sin token → 401",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/conductores",
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "15 · Token modificado → 401",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/conductores",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}x" } ],
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "16 · GET con rol despacho (solo consulta) → 200",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/conductores",
+            "auth": {
+              "type": "bearer",
+              "bearer": [ { "key": "token", "value": "{{token_despacho}}", "type": "string" } ]
+            }
+          }
+        },
+        {
+          "name": "17 · POST con rol despacho (sin permiso) → 403",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba Despacho\",\n  \"cedula\": \"777777\",\n  \"categoria_licencia\": \"C2\",\n  \"telefono\": \"3000000000\",\n  \"sede\": \"Cali\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [ { "key": "token", "value": "{{token_despacho}}", "type": "string" } ]
+            }
+          }
+        },
+        {
+          "name": "18 · POST con rol flota (con permiso) → 201",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": "{{base}}/conductores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba Flota\",\n  \"cedula\": \"888888\",\n  \"categoria_licencia\": \"C3\",\n  \"telefono\": \"3111111111\",\n  \"sede\": \"Medellín\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [ { "key": "token", "value": "{{token_flota}}", "type": "string" } ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · Relaciones (Simulando a ms-vehiculos)",
+      "item": [
+        {
+          "name": "19 y 20 · Validar conductor (GET :id)",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/conductores/1"
+          }
+        },
+        {
+          "name": "22 · Componer listado (GET ?ids=)",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/conductores?ids=1,2"
+          }
+        }
+      ]
+    }
+  ]
+}
